@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase/client'
+import { toast } from 'react-toastify'
 
 type LoginFormProps = {
   nextPath?: string
@@ -13,12 +14,10 @@ export default function LoginForm({ nextPath = '/dashboard' }: LoginFormProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    setError(null)
     const supabase = getSupabaseClient()
 
     const { error } = await supabase.auth.signInWithPassword({
@@ -27,9 +26,10 @@ export default function LoginForm({ nextPath = '/dashboard' }: LoginFormProps) {
     })
 
     if (error) {
-      setError(error.message)
+      toast.error(error.message)
       setLoading(false)
     } else {
+      toast.success('Login successful')
       router.push(nextPath)
       router.refresh()
     }
@@ -45,18 +45,14 @@ export default function LoginForm({ nextPath = '/dashboard' }: LoginFormProps) {
     })
 
     if (error) {
-      setError(error.message)
+      toast.error(error.message)
+    } else {
+      toast.info('Redirecting to Google sign in...')
     }
   }
 
   return (
     <form onSubmit={handleLogin} className="space-y-4">
-      {error && (
-        <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
-          {error}
-        </div>
-      )}
-
       <div>
         <label className="block text-sm font-medium mb-2">Email address</label>
         <input

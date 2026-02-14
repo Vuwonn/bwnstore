@@ -53,6 +53,12 @@ export default function CategoryProducts({
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '')
 
+  const getProductCategoryPath = (product: StoreProduct) => {
+    const categoryTitle =
+      categories.find((category) => category.id === product.category_id)?.title || product.category || 'topup'
+    return `/products/${encodeURIComponent(toCategorySlug(categoryTitle))}`
+  }
+
   return (
     <section>
       <div className="mb-4 flex items-center justify-between">
@@ -118,14 +124,14 @@ export default function CategoryProducts({
               <div className="mt-2">
                 {isLoggedIn ? (
                   <Link
-                    href={`/checkout/${product.id}`}
+                    href={getProductCategoryPath(product)}
                     className="inline-flex w-full justify-center rounded-md bg-orange-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-orange-700"
                   >
                     Buy now
                   </Link>
                 ) : (
                   <Link
-                    href={`/login?next=${encodeURIComponent(`/checkout/${product.id}`)}`}
+                    href={`/login?next=${encodeURIComponent(getProductCategoryPath(product))}`}
                     className="inline-flex w-full justify-center rounded-md border border-orange-300 bg-orange-50 px-3 py-1.5 text-sm font-semibold text-orange-700 transition hover:bg-orange-100"
                   >
                     Login to buy

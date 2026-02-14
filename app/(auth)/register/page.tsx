@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase/client'
+import { toast } from 'react-toastify'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -12,30 +13,29 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    setError(null)
-    setSuccess(null)
 
     const normalizedName = fullName.trim()
     if (normalizedName.length < 2) {
-      setError('Please enter your full name.')
+      const message = 'Please enter your full name.'
+      toast.error(message)
       setLoading(false)
       return
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters.')
+      const message = 'Password must be at least 6 characters.'
+      toast.error(message)
       setLoading(false)
       return
     }
 
     if (password !== confirmPassword) {
-      setError('Password and confirm password do not match.')
+      const message = 'Password and confirm password do not match.'
+      toast.error(message)
       setLoading(false)
       return
     }
@@ -54,17 +54,20 @@ export default function RegisterPage() {
       })
 
       if (error) {
-        setError(error.message)
+        toast.error(error.message)
       } else {
         if (data.session) {
+          toast.success('Account created successfully')
           router.push('/dashboard')
           router.refresh()
           return
         }
-        setSuccess('Account created successfully. You can now sign in.')
+        const message = 'Account created successfully. You can now sign in.'
+        toast.success(message)
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed')
+      const message = err instanceof Error ? err.message : 'Registration failed'
+      toast.error(message)
     } finally {
       setLoading(false)
     }
@@ -76,9 +79,6 @@ export default function RegisterPage() {
         <h1 className="mb-8 text-center text-3xl font-bold">Create account</h1>
 
         <form onSubmit={handleRegister} className="space-y-4">
-          {error && <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</div>}
-          {success && <div className="rounded-lg bg-green-50 p-3 text-sm text-green-700">{success}</div>}
-
           <div>
             <label className="mb-2 block text-sm font-medium">Full name</label>
             <input

@@ -9,6 +9,7 @@ type Product = {
   id: string
   name: string
   description: string | null
+  category: string
   price: number
   currency: string
   image_url: string | null
@@ -46,7 +47,7 @@ export default async function CheckoutPage({ params, searchParams }: CheckoutPag
 
   const { data } = await supabase
     .from('products')
-    .select('id,name,description,price,currency,image_url')
+    .select('id,name,description,category,price,currency,image_url')
     .eq('id', productId)
     .single()
   const product = data as Product | null
@@ -57,6 +58,17 @@ export default async function CheckoutPage({ params, searchParams }: CheckoutPag
 
   const qty = Math.max(1, Number(query.qty || 1) || 1)
   const playerUid = (query.uid || '').trim()
+
+  const categorySlug = product.category
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
+  if (!playerUid) {
+    redirect(`/products/${encodeURIComponent(categorySlug || 'topup')}`)
+  }
+
   const subtotal = product.price * qty
   const paymentQrUrl = process.env.NEXT_PUBLIC_PAYMENT_QR_URL || ''
 
@@ -133,7 +145,7 @@ export default async function CheckoutPage({ params, searchParams }: CheckoutPag
       throw new Error(itemError.message)
     }
 
-    redirect('/dashboard?ordered=1')
+    redirect(`/dashboard/orders?ordered=1&order=${encodeURIComponent(orderNumber)}`)
   }
 
   return (

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import ProofImageViewer from '@/components/common/ProofImageViewer'
+import { toast } from 'react-toastify'
 
 type Product = {
   id: string
@@ -114,7 +115,7 @@ export default function ProductCMS() {
   const [uploadingCategoryImage, setUploadingCategoryImage] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterCategory, setFilterCategory] = useState('all')
-  const [error, setError] = useState<string | null>(null)
+  const [, setError] = useState<string | null>(null)
   const isEditing = useMemo(() => Boolean(form.id), [form.id])
 
   const loadProducts = async () => {
@@ -241,8 +242,11 @@ export default function ProductCMS() {
       await loadProducts()
       resetForm()
       setShowItemModal(false)
+      toast.success(isEditing ? 'Product updated successfully' : 'Product created successfully')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save product')
+      const message = err instanceof Error ? err.message : 'Failed to save product'
+      setError(message)
+      toast.error(message)
     } finally {
       setUploadingItemImage(false)
       setSaving(false)
@@ -281,8 +285,11 @@ export default function ProductCMS() {
       setCategoryImageFile(null)
       setEditingCategoryId(null)
       setShowCategoryModal(false)
+      toast.success(editingCategoryId ? 'Category updated successfully' : 'Category created successfully')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create category')
+      const message = err instanceof Error ? err.message : 'Failed to create category'
+      setError(message)
+      toast.error(message)
     } finally {
       setUploadingCategoryImage(false)
       setCategorySaving(false)
@@ -312,8 +319,11 @@ export default function ProductCMS() {
       const result = (await response.json()) as { error?: string }
       if (!response.ok) throw new Error(result.error || 'Failed to update role')
       await loadUsers()
+      toast.success(isAdmin ? 'User promoted to admin' : 'Admin access removed')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update role')
+      const message = err instanceof Error ? err.message : 'Failed to update role'
+      setError(message)
+      toast.error(message)
     } finally {
       setRoleSavingId(null)
     }
@@ -334,8 +344,11 @@ export default function ProductCMS() {
       const result = (await response.json()) as { error?: string }
       if (!response.ok) throw new Error(result.error || 'Failed to update order status')
       await loadOrders()
+      toast.success(`Order status updated to ${orderStatus}`)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update order status')
+      const message = err instanceof Error ? err.message : 'Failed to update order status'
+      setError(message)
+      toast.error(message)
     } finally {
       setOrderSavingId(null)
     }
@@ -368,8 +381,11 @@ export default function ProductCMS() {
       const result = (await response.json()) as { error?: string }
       if (!response.ok) throw new Error(result.error || 'Failed to delete product')
       await loadProducts()
+      toast.success('Product deleted successfully')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete product')
+      const message = err instanceof Error ? err.message : 'Failed to delete product'
+      setError(message)
+      toast.error(message)
     }
   }
 
@@ -437,8 +453,6 @@ export default function ProductCMS() {
       </aside>
 
       <section className="space-y-6">
-        {error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
-
         {activeSection === 'dashboard' ? (
           <>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { toast } from 'react-toastify'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import ProofImageViewer from '@/components/common/ProofImageViewer'
@@ -25,6 +26,20 @@ export default function MyOrdersPage() {
   const [orders, setOrders] = useState<MyOrder[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [ordered, setOrdered] = useState(false)
+  const [placedOrderNumber, setPlacedOrderNumber] = useState('')
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const isOrdered = params.get('ordered') === '1'
+    const orderNumber = params.get('order') || ''
+    setOrdered(isOrdered)
+    setPlacedOrderNumber(orderNumber)
+
+    if (isOrdered) {
+      toast.success(`Order placed successfully${orderNumber ? ` (${orderNumber})` : ''}`)
+    }
+  }, [])
 
   useEffect(() => {
     const loadOrders = async () => {
@@ -52,6 +67,12 @@ export default function MyOrdersPage() {
         <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <h1 className="text-3xl font-bold text-gray-900">My Orders</h1>
           <p className="mt-1 text-sm text-gray-600">Track your order status and payment proof review.</p>
+          {ordered && (
+            <div className="mt-4 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-700">
+              Order placed successfully{placedOrderNumber ? ` (${placedOrderNumber})` : ''}. We will review and update
+              status soon.
+            </div>
+          )}
 
           {error && <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
 
