@@ -1,9 +1,30 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createServerClient as createSupabaseServerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import type { Database } from '@/types/database'
 
-export const createServerClient = () => {
-  return createServerComponentClient<Database>({ 
-    cookies 
+export const createServerClient = async () => {
+  const cookieStore = await cookies()
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Missing Supabase environment variables')
+  }
+
+  return createSupabaseServerClient<Database>(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll()
+      },
+      setAll(cookiesToSet) {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            cookieStore.set(name, value, options)
+          })
+        } catch {
+          // setAll can be a no-op in Server Components.
+        }
+      },
+    },
   })
 }

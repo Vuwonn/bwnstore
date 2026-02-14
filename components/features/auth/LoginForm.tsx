@@ -2,9 +2,13 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase/client'
+import { getSupabaseClient } from '@/lib/supabase/client'
 
-export default function LoginForm() {
+type LoginFormProps = {
+  nextPath?: string
+}
+
+export default function LoginForm({ nextPath = '/dashboard' }: LoginFormProps) {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -15,6 +19,7 @@ export default function LoginForm() {
     e.preventDefault()
     setLoading(true)
     setError(null)
+    const supabase = getSupabaseClient()
 
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -25,16 +30,17 @@ export default function LoginForm() {
       setError(error.message)
       setLoading(false)
     } else {
-      router.push('/dashboard')
+      router.push(nextPath)
       router.refresh()
     }
   }
 
   const handleGoogleLogin = async () => {
+    const supabase = getSupabaseClient()
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,
       },
     })
 

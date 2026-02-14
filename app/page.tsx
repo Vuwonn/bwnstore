@@ -1,30 +1,83 @@
 import { createServerClient } from '@/lib/supabase/server'
-import ProductGrid from '@/components/features/products/ProductGrid'
+import StorefrontPanel from '@/components/features/products/StorefrontPanel'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 
+type StoreCategory = {
+  id: string
+  title: string
+  description: string | null
+  image_url: string | null
+  matchValue: string
+}
+
+type StoreProduct = {
+  id: string
+  name: string
+  description: string | null
+  category: string
+  category_id: string | null
+  price: number
+  currency: string
+  image_url: string | null
+}
+
 export default async function HomePage() {
-  const supabase = createServerClient()
-  
-  const { data: products } = await supabase
+  const supabase = await createServerClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const { data: productData, error: productError } = await supabase
     .from('products')
-    .select('*')
+    .select('id,name,description,category,category_id,price,currency,image_url,is_available')
     .eq('is_available', true)
-    .limit(8)
+    .order('created_at', { ascending: false })
+    .limit(40)
+
+  let products = (productData ?? []) as StoreProduct[]
+
+  // Fallback for older schemas that may not have category_id yet.
+  if (productError) {
+    const { data: fallbackProducts } = await supabase
+      .from('products')
+      .select('id,name,description,category,price,currency,image_url,is_available')
+      .eq('is_available', true)
+      .order('created_at', { ascending: false })
+      .limit(40)
+
+    products = ((fallbackProducts ?? []) as Array<Omit<StoreProduct, 'category_id'>>).map((p) => ({
+      ...p,
+      category_id: null,
+    }))
+  }
+
+  const { data: categoryData } = await supabase
+    .from('categories')
+    .select('id,title,description,image_url')
+    .order('title', { ascending: true })
+
+  let categories = ((categoryData ?? []) as Array<Omit<StoreCategory, 'matchValue'>>).map((c) => ({
+    ...c,
+    matchValue: c.id,
+  }))
+
+  // If categories are missing, derive them from product.category text.
+  if (categories.length === 0) {
+    categories = Array.from(new Set(products.map((p) => p.category).filter(Boolean))).map((categoryName) => ({
+      id: categoryName,
+      title: categoryName,
+      description: null,
+      image_url: null,
+      matchValue: categoryName,
+    }))
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
       <main className="container mx-auto px-4 py-8">
-        <section className="bg-gradient-to-r from-orange-400 to-orange-600 rounded-lg p-12 text-white mb-8">
-          <h1 className="text-5xl font-bold mb-4">Welcome to NexStore</h1>
-          <p className="text-xl">Your one-stop shop for gaming items</p>
-        </section>
-
-        <section>
-          <h2 className="text-3xl font-bold mb-6">Featured Products</h2>
-          <ProductGrid products={products || []} />
-        </section>
+        <StorefrontPanel categories={categories} products={products} isLoggedIn={Boolean(user)} />
       </main>
       <Footer />
     </div>
