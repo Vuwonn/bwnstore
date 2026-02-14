@@ -22,7 +22,8 @@ export default async function DashboardPage() {
     .eq('id', user.id)
     .maybeSingle()
   const profile = data as ProfileName | null
-  const displayName = profile?.full_name || profile?.username || 'User'
+  const fallbackName = (user.user_metadata?.full_name as string | undefined)?.trim()
+  const displayName = profile?.full_name || profile?.username || fallbackName || 'User'
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl p-6">

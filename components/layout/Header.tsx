@@ -67,7 +67,7 @@ export default function Header() {
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           <Link href="/" className="text-xl font-bold md:text-2xl">
-            NexStore
+            Gaming Shop Np
           </Link>
 
           <div className="hidden items-center space-x-6 md:flex">

@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           <div>
-            <p className="text-2xl font-bold text-orange-400">NexStore</p>
+            <p className="text-2xl font-bold text-orange-400">Gaming Shop Np</p>
             <p className="mt-2 text-sm text-gray-300">We are here to deliver your gaming top-up orders instantly.</p>
           </div>
 
@@ -42,7 +42,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-8 border-t border-white/10 pt-4 text-center text-xs text-gray-400">
-          © {new Date().getFullYear()} NexStore. All rights reserved.
+          © {new Date().getFullYear()} Gaming Shop Np. All rights reserved.
         </div>
       </div>
     </footer>

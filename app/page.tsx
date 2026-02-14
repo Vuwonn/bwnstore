@@ -1,4 +1,5 @@
 import { createServerClient } from '@/lib/supabase/server'
+import type { Metadata } from 'next'
 import StorefrontPanel from '@/components/features/products/StorefrontPanel'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
@@ -20,6 +21,12 @@ type StoreProduct = {
   price: number
   currency: string
   image_url: string | null
+}
+
+export const metadata: Metadata = {
+  title: 'Top Up Free Fire Diamond & PUBG UC from eSewa',
+  description:
+    'Top up Free Fire diamonds and PUBG UC from eSewa in Nepal. Fast order processing, secure checkout, and live order tracking.',
 }
 
 export default async function HomePage() {
@@ -73,8 +80,35 @@ export default async function HomePage() {
     }))
   }
 
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'How to top up diamond UC in Nepal?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Choose your game package, enter your player UID, checkout, and complete payment. Your top-up order is then processed and tracked from your dashboard.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Can I top up Free Fire diamond and PUBG UC from eSewa?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. You can place your order and pay from eSewa during checkout.',
+        },
+      },
+    ],
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <Header />
       <main className="container mx-auto px-4 py-8">
         <StorefrontPanel categories={categories} products={products} isLoggedIn={Boolean(user)} />

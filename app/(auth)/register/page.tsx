@@ -2,11 +2,15 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase/client'
 
 export default function RegisterPage() {
+  const router = useRouter()
+  const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
@@ -17,12 +21,34 @@ export default function RegisterPage() {
     setError(null)
     setSuccess(null)
 
+    const normalizedName = fullName.trim()
+    if (normalizedName.length < 2) {
+      setError('Please enter your full name.')
+      setLoading(false)
+      return
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.')
+      setLoading(false)
+      return
+    }
+
+    if (password !== confirmPassword) {
+      setError('Password and confirm password do not match.')
+      setLoading(false)
+      return
+    }
+
     try {
       const supabase = getSupabaseClient()
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
+          data: {
+            full_name: normalizedName,
+          },
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       })
@@ -30,7 +56,12 @@ export default function RegisterPage() {
       if (error) {
         setError(error.message)
       } else {
-        setSuccess('Account created. Check your email to confirm your account.')
+        if (data.session) {
+          router.push('/dashboard')
+          router.refresh()
+          return
+        }
+        setSuccess('Account created successfully. You can now sign in.')
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed')
@@ -49,6 +80,18 @@ export default function RegisterPage() {
           {success && <div className="rounded-lg bg-green-50 p-3 text-sm text-green-700">{success}</div>}
 
           <div>
+            <label className="mb-2 block text-sm font-medium">Full name</label>
+            <input
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-orange-500"
+              minLength={2}
+              required
+            />
+          </div>
+
+          <div>
             <label className="mb-2 block text-sm font-medium">Email address</label>
             <input
               type="email"
@@ -65,6 +108,18 @@ export default function RegisterPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-orange-500"
+              minLength={6}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium">Confirm password</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-orange-500"
               minLength={6}
               required
