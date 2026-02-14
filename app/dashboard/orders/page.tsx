@@ -63,7 +63,7 @@ export default function MyOrdersPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      <main className="mx-auto max-w-6xl p-6">
+      <main className="mx-auto max-w-7xl p-6">
         <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <h1 className="text-3xl font-bold text-gray-900">My Orders</h1>
           <p className="mt-1 text-sm text-gray-600">Track your order status and payment proof review.</p>

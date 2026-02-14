@@ -61,7 +61,7 @@ export default async function CategoryPage({ params }: Params) {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      <main className="mx-auto max-w-6xl p-6">
+      <main className="mx-auto max-w-7xl p-6">
         <section className="mb-6 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-[260px_1fr]">
             <div className="h-44 bg-gray-100 md:h-full">

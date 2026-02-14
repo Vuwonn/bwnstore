@@ -151,7 +151,7 @@ export default async function CheckoutPage({ params, searchParams }: CheckoutPag
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      <main className="mx-auto max-w-6xl p-6">
+      <main className="mx-auto max-w-7xl p-6">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.25fr_0.9fr]">
           <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
             <h1 className="text-3xl font-bold text-gray-900">Checkout</h1>

@@ -29,7 +29,13 @@ export const metadata: Metadata = {
     'Top up Free Fire diamonds and PUBG UC from eSewa in Nepal. Fast order processing, secure checkout, and live order tracking.',
 }
 
-export default async function HomePage() {
+type HomePageProps = {
+  searchParams: Promise<{ q?: string }>
+}
+
+export default async function HomePage({ searchParams }: HomePageProps) {
+  const params = await searchParams
+  const query = (params.q || '').trim().toLowerCase()
   const supabase = await createServerClient()
   const {
     data: { user },
@@ -80,6 +86,13 @@ export default async function HomePage() {
     }))
   }
 
+  if (query) {
+    products = products.filter((product) => {
+      const haystack = `${product.name} ${product.description || ''} ${product.category}`.toLowerCase()
+      return haystack.includes(query)
+    })
+  }
+
   const faqJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -110,7 +123,7 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <Header />
-      <main className="container mx-auto px-4 py-8">
+      <main className="mx-auto max-w-7xl px-4 py-8">
         <StorefrontPanel categories={categories} products={products} isLoggedIn={Boolean(user)} />
       </main>
       <Footer />
