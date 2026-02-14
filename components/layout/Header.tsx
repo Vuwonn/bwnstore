@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Search, Home, Package, User, LogOut, ShoppingCart, Menu, X } from 'lucide-react'
+import { Home, Package, User, LogOut, Menu, X } from 'lucide-react'
 import { getSupabaseClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
@@ -64,21 +64,13 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-40 bg-orange-500 text-white shadow-lg">
-      <div className="container mx-auto px-4 py-3">
+      <div className="mx-auto max-w-7xl px-4 py-3">
         <div className="flex items-center justify-between">
           <Link href="/" className="text-xl font-bold md:text-2xl">
             Gaming Shop Np
           </Link>
 
           <div className="hidden items-center space-x-6 md:flex">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search product"
-                className="px-4 py-2 rounded-lg text-gray-800 w-64"
-              />
-              <Search className="absolute right-3 top-2.5 text-gray-500 w-5 h-5" />
-            </div>
 
             <Link href="/" className="flex items-center transition hover:text-orange-200">
               <Home className="w-5 h-5 mr-1" />
@@ -88,11 +80,6 @@ export default function Header() {
             <Link href="/dashboard/orders" className="flex items-center transition hover:text-orange-200">
               <Package className="w-5 h-5 mr-1" />
               My Orders
-            </Link>
-
-            <Link href="/cart" className="flex items-center transition hover:text-orange-200">
-              <ShoppingCart className="w-5 h-5 mr-1" />
-              Cart
             </Link>
 
             <Link href="/dashboard/profile" className="flex items-center transition hover:text-orange-200">
@@ -128,15 +115,6 @@ export default function Header() {
 
         {mobileOpen && (
           <div className="mt-3 space-y-3 rounded-lg bg-orange-600/95 p-3 md:hidden">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search product"
-                className="w-full rounded-lg px-3 py-2 text-gray-800"
-              />
-              <Search className="absolute right-3 top-2.5 h-5 w-5 text-gray-500" />
-            </div>
-
             <div className="grid grid-cols-1 gap-2 text-sm">
               <Link href="/" onClick={() => setMobileOpen(false)} className="rounded-md px-2 py-2 hover:bg-white/10">
                 Home
@@ -147,9 +125,6 @@ export default function Header() {
                 className="rounded-md px-2 py-2 hover:bg-white/10"
               >
                 My Orders
-              </Link>
-              <Link href="/cart" onClick={() => setMobileOpen(false)} className="rounded-md px-2 py-2 hover:bg-white/10">
-                Cart
               </Link>
               <Link
                 href="/dashboard/profile"
