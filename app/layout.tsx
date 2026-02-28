@@ -1,6 +1,7 @@
 import "./globals.css"
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import Script from "next/script"
 import ToastProvider from '@/components/common/ToastProvider'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -62,6 +63,19 @@ export default function RootLayout({
       <body className={inter.className}>
         {children}
         <ToastProvider />
+
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-9KDWCFES28"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-9KDWCFES28');
+          `}
+        </Script>
       </body>
     </html>
   )
